@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.0.0
+    volumes:
+     - ./monitor/prometheus.yml:/etc/prometheus/prometheus.yml
+     - prometheus_data:/prometheus
+    command: --config.file=/etc/prometheus/prometheus.yml
+    ports:
+     - 9090:9090
+    depends_on:
+     - telegraf
+
+  telegraf:
+    image: telegraf:1.8
+    volumes:
+     - ./monitor/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    ports:
+     - 9100:9100
+    
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+     - 3000:3000
+    depends_on:
+      - prometheus
+
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
